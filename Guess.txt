@@ -1,0 +1,12 @@
+local loader = peripheral.wrap("left")
+local reset = true
+
+while true do
+    local result = loader.loadChunksBatch(0, 0, 500, 50, reset)
+    reset = false
+    print("Loaded "..result.loadedThisBatch.." chunks this batch ("..result.chunksLoadedSoFar.."/"..result.totalChunks..")")
+    if result.done then break end
+    os.sleep(0)
+end
+
+print("All chunks loaded!")

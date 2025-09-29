@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ggg",
+    "imi",
+    "sss"
+  ],
+  "key": {
+    "g": { "item": "minecraft:grass_block"},
+    "i": { "item": "minecraft:iron_ingot" },
+    "s": { "item": "minecraft:stone"},
+    "m": { "item": "minecraft:map" }
+  },
+  "result": {
+    "item": "chunktracer:chunktracer_block",
+    "count": 1
+  }
+}
