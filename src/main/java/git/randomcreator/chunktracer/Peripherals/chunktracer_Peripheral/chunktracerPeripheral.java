@@ -123,13 +123,21 @@ public class chunktracerPeripheral implements IPeripheral {
         int x_distance = Math.abs(start_x - end_x);
         int y_distance = Math.abs(start_y - end_y);
         int z_distance = Math.abs(start_z - end_z);
+        Set<ChunkPos> loadedChunks = new HashSet<>();
         List<Map<String, Object>> result = new ArrayList<>();
         if (x_distance * y_distance * z_distance > 35000) throw new LuaException("The total area can not be more than 35000 blocks");
         for (int x = 0; x <= x_distance; x++) {
             for (int y = 0; y <= y_distance; y++) {
                 for (int z = 0; z <= z_distance; z++) {
+
                     BlockPos pos = new BlockPos(start_x + x, start_y + y, start_z + z);
-                    LevelChunk Chunk = world.getChunkAt(pos);
+                    int chunkX = Math.floorDiv(start_x + x, 16);
+                    int chunkZ = Math.floorDiv(start_z + z, 16);
+                    ChunkPos chunkChecked = new ChunkPos(chunkX, chunkZ);
+                    if (!loadedChunks.contains(chunkChecked)) {
+                        world.getChunkAt(pos);
+                        loadedChunks.add(chunkChecked);
+                    };
                     String blockName = GetBlockForPeripherals(world, pos);
                     if (!blockName.equals("minecraft:air") && !blockName.equals("minecraft:void_air") && !blockName.equals("minecraft:cave_air")) {
                         // pos table
@@ -196,13 +204,20 @@ public class chunktracerPeripheral implements IPeripheral {
     public List<Map<String, Object>> getCubeFromRadius(int x, int y, int z, int radius) throws LuaException {
         Level world = getTileEntity().getLevel();
         List<Map<String, Object>> result = new ArrayList<>();
-        if (radius < 0 || radius > 75) throw new LuaException("Radius has a max of 75 and a min of 1.");
+        if (radius < 0 || radius > 30) throw new LuaException("Radius has a max of 30 and a min of 1.");
         BlockPos center = new BlockPos(x, y, z);
+        Set<ChunkPos> loadedChunks = new HashSet<>();
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dy = -radius; dy <= radius; dy++) {
                 for (int dz = -radius; dz <= radius; dz++) {
                     BlockPos pos = center.offset(dx, dy, dz);
-                    LevelChunk Chunk = world.getChunkAt(pos);
+                    int chunkX = Math.floorDiv(dx, 16);
+                    int chunkZ = Math.floorDiv(dz, 16);
+                    ChunkPos chunkChecked = new ChunkPos(chunkX, chunkZ);
+                    if (!loadedChunks.contains(chunkChecked)) {
+                        world.getChunkAt(pos);
+                        loadedChunks.add(chunkChecked);
+                    };
                     String blockName = GetBlockForPeripherals(world, pos);
                     if (!blockName.equals("minecraft:air") && !blockName.equals("minecraft:void_air") && !blockName.equals("minecraft:cave_air")) {
                         // pos table
@@ -234,6 +249,8 @@ public class chunktracerPeripheral implements IPeripheral {
         List<Map<String, Object>> blocks = new ArrayList<>();
         int radiusSq = radius * radius;
 
+        Set<ChunkPos> loadedChunks = new HashSet<>();
+
         for (int x = centerX - radius; x <= centerX + radius; x++) {
             for (int y = centerY - radius; y <= centerY + radius; y++) {
                 for (int z = centerZ - radius; z <= centerZ + radius; z++) {
@@ -241,8 +258,16 @@ public class chunktracerPeripheral implements IPeripheral {
                     int dy = y - centerY;
                     int dz = z - centerZ;
 
+
                     if (dx * dx + dy * dy + dz * dz <= radiusSq) {
                         BlockPos pos = new BlockPos(x, y, z);
+                        int chunkX = Math.floorDiv(dx, 16);
+                        int chunkZ = Math.floorDiv(dz + z, 16);
+                        ChunkPos chunkChecked = new ChunkPos(chunkX, chunkZ);
+                        if (!loadedChunks.contains(chunkChecked)) {
+                            world.getChunkAt(pos);
+                            loadedChunks.add(chunkChecked);
+                        };
                         BlockState state = world.getBlockState(pos);
 
                         if (!state.isAir()) {
