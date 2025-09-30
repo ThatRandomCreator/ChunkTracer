@@ -245,7 +245,7 @@ public class chunktracerPeripheral implements IPeripheral {
     public final List<Map<String, Object>> getSphereFromRadius(int centerX, int centerY, int centerZ, int radius) throws LuaException {
         Level world = getTileEntity().getLevel();
         if (world == null) throw new LuaException("World not loaded");
-
+        if (radius < 0 || radius > 30) throw new LuaException("Radius has a max of 30 and a min of 1.");
         List<Map<String, Object>> blocks = new ArrayList<>();
         int radiusSq = radius * radius;
 
